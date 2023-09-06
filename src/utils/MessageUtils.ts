@@ -15,7 +15,33 @@ function createDir(dirPath: string) {
 export type MessageJSON = {
   chatName: string, talkerName: string, text: string, datetime: string, timestamp: number
 }
+export type UserAssistantMessage = {
+  role: "user" | "assistant", content: string
+}
 
+export function getUserAssistantMessages(chatName: string): UserAssistantMessage[] {
+  const filePath = path.resolve(`./data/total/${chatName}.json`);
+  try { return JSON.parse(fs.readFileSync(filePath, 'utf-8')) }
+  catch (e) { log.error(LOGPRE, "read file failed", e) }
+  return [];
+}
+function saveUserAssistantMessageToJSONFile(message: Message, messageJSON: MessageJSON) {
+  const filePath = path.resolve(`./data/total/${messageJSON.chatName}.json`);
+
+  createDir(path.resolve(`./data/total`));
+
+  let allMessages = [];
+  try { allMessages = JSON.parse(fs.readFileSync(filePath, 'utf-8')) }
+  catch (e) { log.error(LOGPRE, "read file failed", e) }
+
+  allMessages.push({
+    role: message.self() ? "assistant" : "user",
+    content: messageJSON.text
+  });
+
+  try { fs.writeFileSync(filePath, JSON.stringify(allMessages, null, 2), 'utf-8') }
+  catch (e) { log.error(LOGPRE, "write file failed", e) }
+}
 function saveMessageToJSONFile(messageJSON: MessageJSON) {
   const today = moment().format('YYYY-MM-DD');
   const filePath = path.resolve(`./data/${today}/${messageJSON.chatName}.json`);
@@ -67,6 +93,8 @@ export async function processMessage(message: Message) {
 
       saveMessageToJSONFile(messageJSON);
       saveMessageToPlainFile(messageJSON);
+
+      saveUserAssistantMessageToJSONFile(message, messageJSON);
 
       return messageJSON;
     case PUPPET.types.Message.Attachment:

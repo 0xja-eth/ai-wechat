@@ -20,13 +20,19 @@ function isEnable(text) {
 }
 
 export default async function(message: Message, json: MessageJSON) {
-  const { chatName, talkerName, text } = json;
+  let { chatName, talkerName, text } = json;
+
+  if (message.self()) return false
 
   if (!isEnable(text)) return false
   if (!MonitorRooms.includes(chatName)) return false
-  if (text.startsWith("「") || text.endsWith(" ")) return false
 
   const room = message.room();
+  if (room && !await message.mentionSelf()) return false
+
+  text = text.replace(/@.+?\s/g, "").trim()
+  if (!text.startsWith("纠正")) return false
+  text = text.replace("纠正", "").trim()
 
   try {
     const { reply } = await CorrectEnglish({

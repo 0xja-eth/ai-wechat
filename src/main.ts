@@ -14,7 +14,7 @@ const puppet = new PuppetPadlocal({ token: process.env.PADLOCAL_API_KEY });
 
 const bot = WechatyBuilder.build({
   name: 'PadLocalDemo',
-  puppet,
+  puppet
 })
   .on('scan', (qrcode, status) => {
     if (status === ScanStatus.Waiting && qrcode) {
@@ -48,14 +48,17 @@ const bot = WechatyBuilder.build({
 
     const messageJSON = await processMessage(message);
 
-    if (messageJSON) {
-      await EnglishTeacher(message, messageJSON) ||
-      await EnglishCorrection(message, messageJSON)
+    if (message.self() && messageJSON?.text == "logout")
+      await bot.logout()
+    else if (messageJSON) {
+      await EnglishCorrection(message, messageJSON) ||
+      await EnglishTeacher(message, messageJSON)
     }
   })
 
   .on('room-invite', async (roomInvitation) => {
     log.info(LOGPRE, `on room-invite: ${roomInvitation}`);
+    roomInvitation.accept();
   })
 
   .on('room-join', (room, inviteeList, inviter, date) => {
@@ -75,13 +78,14 @@ const bot = WechatyBuilder.build({
 
   .on('friendship', (friendship) => {
     log.info(LOGPRE, `on friendship: ${friendship}`);
+    friendship.accept();
   })
 
   .on('error', (error) => {
     log.error(LOGPRE, `on error: ${error}`);
   });
 
-bot.start().then(() => {
+bot.reset().then(() => bot.start()).then(() => {
   log.info(LOGPRE, 'started.');
 });
 
