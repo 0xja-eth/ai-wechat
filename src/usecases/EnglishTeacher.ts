@@ -3,7 +3,7 @@ import { getUserAssistantMessages, MessageJSON, UserAssistantMessage } from '../
 import { LOGPRE } from '../main';
 import { post } from '../utils/APIUtils';
 
-const CorrectEnglish = post<{
+const EnglishTeacher = post<{
   api_key: string, system: string, messages?: UserAssistantMessage[]
 }, {
   reply: string
@@ -27,7 +27,7 @@ export default async function(message: Message, json: MessageJSON) {
   if (room && !await message.mentionSelf()) return false
 
   try {
-    const { reply } = await CorrectEnglish({
+    const { reply } = await EnglishTeacher({
       system: `你是一个英语老师，有一名初中生想提一些英语问题，请您耐心解答。`,
       messages, api_key: APIKey
     });
