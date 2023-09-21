@@ -7,14 +7,19 @@ import { PuppetPadlocal } from 'wechaty-puppet-padlocal';
 import { processMessage } from './utils/MessageUtils';
 import EnglishCorrection from './usecases/EnglishCorrection';
 import EnglishTeacher from './usecases/EnglishTeacher';
+import OpenAI from 'openai';
 
 export const LOGPRE = '[PadLocalDemo]';
 
-const puppet = new PuppetPadlocal({ token: process.env.PADLOCAL_API_KEY });
+export const Openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  baseURL: process.env.BASE_URL
+})
+export const Puppet = new PuppetPadlocal({ token: process.env.PADLOCAL_API_KEY });
 
-const bot = WechatyBuilder.build({
+export const Bot = WechatyBuilder.build({
   name: 'PadLocalDemo',
-  puppet
+  puppet: Puppet
 })
   .on('scan', (qrcode, status) => {
     if (status === ScanStatus.Waiting && qrcode) {
@@ -37,6 +42,7 @@ const bot = WechatyBuilder.build({
 
   .on('login', (user) => {
     log.info(LOGPRE, `${user} login`);
+    log.info(LOGPRE, `Name: ${Bot.currentUser.name()}`)
   })
 
   .on('logout', (user, reason) => {
@@ -49,7 +55,7 @@ const bot = WechatyBuilder.build({
     const messageJSON = await processMessage(message);
 
     if (message.self() && messageJSON?.text == "logout")
-      await bot.logout()
+      await Bot.logout()
     else if (messageJSON) {
       await EnglishCorrection(message, messageJSON) ||
       await EnglishTeacher(message, messageJSON)
@@ -85,7 +91,7 @@ const bot = WechatyBuilder.build({
     log.error(LOGPRE, `on error: ${error}`);
   });
 
-bot.reset().then(() => bot.start()).then(() => {
+Bot.reset().then(() => Bot.start()).then(() => {
   log.info(LOGPRE, 'started.');
 });
 

@@ -1,6 +1,6 @@
 import { log, Message } from 'wechaty';
 import { getUserAssistantMessages, MessageJSON, UserAssistantMessage } from '../utils/MessageUtils';
-import { LOGPRE } from '../main';
+import { Bot, LOGPRE, Openai } from '../main';
 import { post } from '../utils/APIUtils';
 
 const EnglishTeacher = post<{
@@ -27,10 +27,18 @@ export default async function(message: Message, json: MessageJSON) {
   if (room && !await message.mentionSelf()) return false
 
   try {
-    const { reply } = await EnglishTeacher({
-      system: `你是一个英语老师，有一名初中生想提一些英语问题，请您耐心解答。`,
-      messages, api_key: APIKey
+    const completion = await Openai.chat.completions.create({
+      model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo-16k',
+      messages: [{
+        role: "system",
+        content: `你的名字是${Bot.currentUser.name}，是一个英语老师，有一名初中生想提一些英语问题，请您耐心解答。`
+      }, ...messages]
     });
+    const reply = completion.choices[0].message
+    // const { reply } = await EnglishTeacher({
+    //   system: `你是一个英语老师，有一名初中生想提一些英语问题，请您耐心解答。`,
+    //   messages, api_key: APIKey
+    // });
     const replyText = `${reply} `;
 
     if (room) await room?.say(replyText)

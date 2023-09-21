@@ -4,6 +4,7 @@ import { log, Message } from 'wechaty';
 import * as PUPPET from 'wechaty-puppet';
 import moment from 'moment';
 import { LOGPRE } from '../main';
+import { StringUtils } from './StringUtils';
 
 function createDir(dirPath: string) {
   if (!fs.existsSync(dirPath)) {
@@ -20,12 +21,15 @@ export type UserAssistantMessage = {
 }
 
 export function getUserAssistantMessages(chatName: string): UserAssistantMessage[] {
+  chatName = StringUtils.ensureFileNameValid(chatName)
   const filePath = path.resolve(`./data/total/${chatName}.json`);
   try { return JSON.parse(fs.readFileSync(filePath, 'utf-8')) }
   catch (e) { log.error(LOGPRE, "read file failed", e) }
   return [];
 }
 function saveUserAssistantMessageToJSONFile(message: Message, messageJSON: MessageJSON) {
+  messageJSON.chatName = StringUtils.ensureFileNameValid(messageJSON.chatName)
+
   const filePath = path.resolve(`./data/total/${messageJSON.chatName}.json`);
 
   createDir(path.resolve(`./data/total`));
@@ -43,6 +47,8 @@ function saveUserAssistantMessageToJSONFile(message: Message, messageJSON: Messa
   catch (e) { log.error(LOGPRE, "write file failed", e) }
 }
 function saveMessageToJSONFile(messageJSON: MessageJSON) {
+  messageJSON.chatName = StringUtils.ensureFileNameValid(messageJSON.chatName)
+
   const today = moment().format('YYYY-MM-DD');
   const filePath = path.resolve(`./data/${today}/${messageJSON.chatName}.json`);
 
@@ -58,6 +64,8 @@ function saveMessageToJSONFile(messageJSON: MessageJSON) {
   catch (e) { log.error(LOGPRE, "write file failed", e) }
 }
 function saveMessageToPlainFile(messageJSON: MessageJSON) {
+  messageJSON.chatName = StringUtils.ensureFileNameValid(messageJSON.chatName)
+
   const today = moment().format('YYYY-MM-DD');
   const filePath = path.resolve(`./data/${today}/${messageJSON.chatName}.txt`);
 

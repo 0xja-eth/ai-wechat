@@ -40,4 +40,8 @@ export class StringUtils {
 		return this.fillData2Str(str, data, deleteKey, /:(.+?)(\/|$|&)/g)
 	}
 
+	public static ensureFileNameValid(name: string, replacer = "-") {
+		const invalidCharactersRegex = /[\/:*?"<>|\\]/g;
+		return name.replace(invalidCharactersRegex, replacer);
+	}
 }
