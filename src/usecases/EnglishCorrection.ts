@@ -3,12 +3,6 @@ import { MessageJSON } from '../utils/MessageUtils';
 import { LOGPRE, Openai } from '../main';
 import { post } from '../utils/APIUtils';
 
-const CorrectEnglish = post<{
-  api_key: string, prompt: string, content?: string
-}, {
-  reply: string
-}>("http://127.0.0.1:8090", "/generate2")
-
 const APIKey = process.env.OPENAI_API_KEY
 const MonitorRooms = process.env.MONITOR_ROOMS?.split(',') || [];
 const MonitorUsers = process.env.MONITOR_USERS?.split(',') || [];

@@ -43,6 +43,7 @@ export const Bot = WechatyBuilder.build({
   .on('login', (user) => {
     log.info(LOGPRE, `${user} login`);
     log.info(LOGPRE, `Name: ${Bot.currentUser.name()}`)
+    // Bot.logout()
   })
 
   .on('logout', (user, reason) => {

@@ -3,12 +3,6 @@ import { getUserAssistantMessages, MessageJSON, UserAssistantMessage } from '../
 import { Bot, LOGPRE, Openai } from '../main';
 import { post } from '../utils/APIUtils';
 
-const EnglishTeacher = post<{
-  api_key: string, system: string, messages?: UserAssistantMessage[]
-}, {
-  reply: string
-}>("http://127.0.0.1:8090", "/generate3")
-
 const APIKey = process.env.OPENAI_API_KEY
 const MonitorRooms = process.env.MONITOR_ROOMS?.split(',') || [];
 const MonitorUsers = process.env.MONITOR_USERS?.split(',') || [];
