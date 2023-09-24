@@ -14,21 +14,21 @@ export default async function(message: Message, json: MessageJSON) {
 
   if (!MonitorRooms.includes(chatName)) return false
 
-  const messages = getUserAssistantMessages(chatName);
+  let messages = getUserAssistantMessages(chatName);
   if (messages.length < 0) return;
 
   const room = message.room();
   if (room && !await message.mentionSelf()) return false
 
   try {
+    messages = [{
+      role: "system",
+      content: `你的名字是“${Bot.currentUser.name()}”，是一个英语老师，有一名初中生想提一些英语问题，请您耐心解答。`
+    }, ...messages]
     const completion = await Openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo-16k',
-      messages: [{
-        role: "system",
-        content: `你的名字是${Bot.currentUser.name}，是一个英语老师，有一名初中生想提一些英语问题，请您耐心解答。`
-      }, ...messages]
+      model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo-16k', messages
     });
-    const reply = completion.choices[0].message
+    const reply = completion.choices[0].message.content
     // const { reply } = await EnglishTeacher({
     //   system: `你是一个英语老师，有一名初中生想提一些英语问题，请您耐心解答。`,
     //   messages, api_key: APIKey

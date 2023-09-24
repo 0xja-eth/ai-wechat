@@ -17,26 +17,26 @@ export type MessageJSON = {
   chatName: string, talkerName: string, text: string, datetime: string, timestamp: number
 }
 export type UserAssistantMessage = {
-  role: "user" | "assistant", content: string
+  role: "system" | "user" | "assistant", content: string
 }
 
 export function getUserAssistantMessages(chatName: string): UserAssistantMessage[] {
   chatName = StringUtils.ensureFileNameValid(chatName)
   const filePath = path.resolve(`./data/total/${chatName}.json`);
   try { return JSON.parse(fs.readFileSync(filePath, 'utf-8')) }
-  catch (e) { log.error(LOGPRE, "read file failed", e) }
+  catch (e) { log.error(LOGPRE, `read file failed ${filePath}`, e) }
   return [];
 }
 function saveUserAssistantMessageToJSONFile(message: Message, messageJSON: MessageJSON) {
-  messageJSON.chatName = StringUtils.ensureFileNameValid(messageJSON.chatName)
+  const chatName = StringUtils.ensureFileNameValid(messageJSON.chatName)
 
-  const filePath = path.resolve(`./data/total/${messageJSON.chatName}.json`);
+  const filePath = path.resolve(`./data/total/${chatName}.json`);
 
   createDir(path.resolve(`./data/total`));
 
   let allMessages = [];
   try { allMessages = JSON.parse(fs.readFileSync(filePath, 'utf-8')) }
-  catch (e) { log.error(LOGPRE, "read file failed", e) }
+  catch (e) { log.error(LOGPRE, `read file failed ${filePath}`, e) }
 
   allMessages.push({
     role: message.self() ? "assistant" : "user",
@@ -44,37 +44,37 @@ function saveUserAssistantMessageToJSONFile(message: Message, messageJSON: Messa
   });
 
   try { fs.writeFileSync(filePath, JSON.stringify(allMessages, null, 2), 'utf-8') }
-  catch (e) { log.error(LOGPRE, "write file failed", e) }
+  catch (e) { log.error(LOGPRE, `write file failed ${filePath}`, e) }
 }
 function saveMessageToJSONFile(messageJSON: MessageJSON) {
-  messageJSON.chatName = StringUtils.ensureFileNameValid(messageJSON.chatName)
+  const chatName = StringUtils.ensureFileNameValid(messageJSON.chatName)
 
   const today = moment().format('YYYY-MM-DD');
-  const filePath = path.resolve(`./data/${today}/${messageJSON.chatName}.json`);
+  const filePath = path.resolve(`./data/${today}/${chatName}.json`);
 
   createDir(path.resolve(`./data/${today}`));
 
   let allMessages = [];
   try { allMessages = JSON.parse(fs.readFileSync(filePath, 'utf-8')) }
-  catch (e) { log.error(LOGPRE, "read file failed", e) }
+  catch (e) { log.error(LOGPRE, `read file failed ${filePath}`, e) }
 
   allMessages.push(messageJSON);
 
   try { fs.writeFileSync(filePath, JSON.stringify(allMessages, null, 2), 'utf-8') }
-  catch (e) { log.error(LOGPRE, "write file failed", e) }
+  catch (e) { log.error(LOGPRE, `write file failed ${filePath}`, e) }
 }
 function saveMessageToPlainFile(messageJSON: MessageJSON) {
-  messageJSON.chatName = StringUtils.ensureFileNameValid(messageJSON.chatName)
+  const chatName = StringUtils.ensureFileNameValid(messageJSON.chatName)
 
   const today = moment().format('YYYY-MM-DD');
-  const filePath = path.resolve(`./data/${today}/${messageJSON.chatName}.txt`);
+  const filePath = path.resolve(`./data/${today}/${chatName}.txt`);
 
   createDir(path.resolve(`./data/${today}`));
 
   const data = `${messageJSON.datetime}:\n${messageJSON.talkerName}:\n${messageJSON.text}\n\n`;
 
   try { fs.appendFileSync(filePath, data) }
-  catch (e) { log.error(LOGPRE, "write file failed", e) }
+  catch (e) { log.error(LOGPRE, `write file failed ${filePath}`, e) }
 }
 
 export async function processMessage(message: Message) {
