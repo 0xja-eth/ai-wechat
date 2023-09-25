@@ -22,7 +22,10 @@
   },
   "scripts": {
     "watch": "npx ts-node ./src/main.ts",
-    "summarize": "npx ts-node ./src/summarize.ts"
+    "summarize": "npx ts-node ./src/summarize.ts",
+
+    "build-test": "./scripts/build-test.sh",
+    "run-test": "./scripts/build-test.sh & ./scripts/run-test.sh"
   },
   "engines": {
     "node": ">= 16",
