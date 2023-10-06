@@ -29,9 +29,11 @@ export default async function(message: Message, json: MessageJSON) {
   text = text.replace("纠正", "").trim()
 
   try {
-    const completion = await Openai.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo-16k',
-      prompt: `你是一个英语老师，请您纠正我下面说的英文内容的语法错误、拼写错误和表达错误，并将其翻译为中文。
+    const completion = await Openai.chat.completions.create({
+      model: process.env.OPENAI_MODEL || 'davinci-002',
+      messages: [{
+        role: "system",
+        content: `你是一个英语老师，请您纠正我下面说的英文内容的语法错误、拼写错误和表达错误，并将其翻译为中文。
 如果你认为有错误，回答的格式为：
 原文：原文内容
 问题：1.XXX，2.XXX，3.XXX ...
@@ -46,8 +48,9 @@ export default async function(message: Message, json: MessageJSON) {
 
 我说的内容是：
 ${text}`
+      }]
     })
-    const reply = completion.choices[0].text
+    const reply = completion.choices[0].message.content
 
 //     const { reply } = await CorrectEnglish({
 //       prompt: `你是一个英语老师，请您纠正我下面说的英文内容的语法错误、拼写错误和表达错误，并将其翻译为中文。

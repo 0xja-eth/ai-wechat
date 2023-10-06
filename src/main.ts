@@ -13,7 +13,7 @@ export const LOGPRE = '[PadLocalDemo]';
 
 export const Openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-  baseURL: process.env.BASE_URL
+  baseURL: process.env.OPENAI_API_BASE
 })
 export const Puppet = new PuppetPadlocal({ token: process.env.PADLOCAL_API_KEY });
 
