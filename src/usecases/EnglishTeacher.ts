@@ -42,6 +42,7 @@ export default async function(message: Message, json: MessageJSON) {
     }
     return true;
   } catch (e) {
+    console.error("generate reply fail:", e)
     log.error(LOGPRE, "generate reply fail:", e)
   }
 }

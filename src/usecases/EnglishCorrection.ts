@@ -81,6 +81,7 @@ ${text}`
       return true;
     }
   } catch (e) {
+    console.error("generate reply fail:", e)
     log.error(LOGPRE, "generate reply fail:", e)
   }
 }
