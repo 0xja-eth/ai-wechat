@@ -13,3 +13,5 @@ pnpm-lock.yaml
 ```
 
 *.zip
+bfg.jar
+*bfg-report
